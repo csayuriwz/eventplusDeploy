@@ -1,12 +1,13 @@
 import React from "react";
 import "./EventoAnterior.css";
+import { Link } from "react-router-dom";
 
 import { Tooltip } from "react-tooltip";
 
 // importar a função lá do arquivo stringFunction (destructuring)
 import { dateFormatDbToView } from "../../Utils/stringFunctions";
 
-const EventoAnterior = ({ title, description, eventDate, idEvent }) => {
+const EventoAnterior = ({ title, description, eventDate, idEvent, evento }) => {
   function detalhes(idEvent) {
     // dá pra usar a prop idEvent? testar
     alert(`Chamar o recurso para os detalhes do evento: ${idEvent}`);
@@ -31,14 +32,27 @@ const EventoAnterior = ({ title, description, eventDate, idEvent }) => {
         {dateFormatDbToView(eventDate)}
       </p>
 
-      <a
-        onClick={() => {
-          detalhes(idEvent);
-        }}
+      <Link className="event-card__connect-link"></Link>
+
+      {/* <a
+      state={evento} href={"/detalhes-evento"}
+        // onClick={() => {
+        //   detalhes(idEvent);
+        // }}
         className="event-card__connect-link"
       >
         Detalhes do Evento
-      </a>
+      </a> */}
+
+      <Link
+      state={evento} to={`/detalhes-evento/${idEvent}`}
+        // onClick={() => {
+        //   detalhes(idEvent);
+        // }}
+        className="event-card__connect-link"
+      >
+        Detalhes do Evento
+      /</Link>
     </article>
   );
 };
