@@ -109,8 +109,6 @@ const HomePage = () => {
         </Container>
       </section>
 
-     
-
       <VisionSection />
       <ContactSection />
     </MainContent>

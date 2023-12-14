@@ -50,7 +50,7 @@ const Table = ({ dados, fnDelete = null, fnUpdate = null }) => {
                 data-tooltip-content={tp.descricao}
                 data-tooltip-place="top"
               >
-                {tp.descricao.substr(0, 15)} ...
+                {/* {tp.descricao.substr(0, 15)} ... */}
                 <Tooltip
                   id="description-tooltip"
                   className="custom-tootip"

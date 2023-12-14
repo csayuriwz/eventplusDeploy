@@ -7,7 +7,7 @@ import { Tooltip } from "react-tooltip";
 // importar a função lá do arquivo stringFunction (destructuring)
 import { dateFormatDbToView } from "../../Utils/stringFunctions";
 
-const EventoAnterior = ({ title, description, eventDate, idEvent, evento }) => {
+const EventoAnterior = ({ title, description = "", eventDate = "", idEvent, evento }) => {
   function detalhes(idEvent) {
     // dá pra usar a prop idEvent? testar
     alert(`Chamar o recurso para os detalhes do evento: ${idEvent}`);
@@ -25,11 +25,13 @@ const EventoAnterior = ({ title, description, eventDate, idEvent, evento }) => {
       >
         <Tooltip id={idEvent} className="tooltip" />
         {description.substr(0, 15)} ...
+        ...
       </p>
 
       <p className="event-card__description">
         {/* aplicar a função pra converter a data */}
         {dateFormatDbToView(eventDate)}
+        {/* {eventDate} */}
       </p>
 
       <Link className="event-card__connect-link"></Link>
@@ -52,7 +54,7 @@ const EventoAnterior = ({ title, description, eventDate, idEvent, evento }) => {
         className="event-card__connect-link"
       >
         Detalhes do Evento
-      /</Link>
+      </Link>
     </article>
   );
 };

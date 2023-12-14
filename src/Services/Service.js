@@ -28,6 +28,7 @@ export const commentaryEventResource = '/ComentariosEvento';
  */
 export const eventoAnteriorResource = '/Evento/ListarAnteriores';
 /**
+ * 
  
  *  * Rota para o recurso Próximos Eventos
  */
@@ -44,6 +45,8 @@ export const institutionResource = '/Instituicao';
  * Rota para o recurso Login
  */
 export const loginResource = '/Login';
+
+// export const DetalhesDoEventoResource = '/Evento/DetalhesDoEvento';
 
 // const apiPort = '5000';
 // const localApiUri = `http://localhost:${apiPort}/api`;
