@@ -12,6 +12,14 @@ const EventoAnterior = ({ title, description = "", eventDate = "", idEvent, even
     // dá pra usar a prop idEvent? testar
     alert(`Chamar o recurso para os detalhes do evento: ${idEvent}`);
   }
+
+  const objeto = {
+    nomeEvento : title,
+    descicao : description,
+    dataEvento : eventDate,
+    idevento : idEvent
+  }
+
   return (
     <article className="event-card">
       <h2 className="event-card__title">{title}</h2>
@@ -47,7 +55,7 @@ const EventoAnterior = ({ title, description = "", eventDate = "", idEvent, even
       </a> */}
 
       <Link
-      state={evento} to={`/detalhes-evento/${idEvent}`}
+      state={objeto} to={`/detalhes-evento/${idEvent}`}
         // onClick={() => {
         //   detalhes(idEvent);
         // }}

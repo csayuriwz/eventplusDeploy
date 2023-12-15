@@ -1,76 +1,126 @@
-import api, { commentaryEventResource } from "../../Services/Service";
-import React, { useContext, useEffect, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
-import { UserContext } from "../../context/AuthContext";
-import MainContent from "../../components/MainContent/MainContent";
-import Notification from "../../components/Notification/Notification";
-import Banner from "../../components/Banner/Banner";
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import "./DetalhesEvento.css";
 import Container from "../../components/Container/Container";
-import EventoAnterior from "../../components/EventoAnterior/EventoAnterior";
+import MainContent from "../../components/MainContent/MainContent";
 import Title from "../../components/Title/Title";
-import VisionSection from "../../components/VisionSection/VisionSection";
-import ContactSection from "../../components/ContactSection/ContactSection";
-import { eventoAnteriorResource } from "../../Services/Service";
-import backArrow from '../../assets/images/arrow-back-8.svg'
-
-import "./DetalhesEvento.css"
+import api from "../../Services/Service";
+import { useParams } from "react-router-dom";
+import TableEvComments from "./TableEvComments/TableEvComments";
+import { UserContext } from "./../../context/AuthContext";
 
 const DetalhesEvento = () => {
-  //   const { state } = useLocation();
-
-  const { catarina } = useParams();
+  const { idEvento } = useParams();
   const { userData } = useContext(UserContext);
-  const {state} = useLocation();
 
+  const [evento, setEvento] = useState({});
+  const [tipoEvento, setTipoEvento] = useState("");
+  const [instituicao, setInstituicao] = useState("");
 
-  const [evento, setEvento] = useState([]);
-  const [eventosAnteriores, setEventosAnteriores] = useState([]);
-  const [feedback, setFeedback] = useState([]);
-  const [notifyUser, setNotifyUser] = useState(); //Componente Notification
+  const [comentarios, setComentarios] = useState([]);
 
- 
+  const getEvento = useCallback(async () => {
+    try {
+      const promise = await api.get(`/Evento/${idEvento}`);
+      setEvento(promise.data);
+      console.log(promise.data);
+      setTipoEvento(promise.data.tiposEvento.titulo);
+      setInstituicao(promise.data.instituicao.nomeFantasia);
+    } catch (error) {
+      console.log("Erro ao buscar evento", error);
+    }
+  }, [idEvento]);
+
+  const getComentario = useCallback(async () => {
+    try {
+      const promise = await api.get(`/ComentariosEvento?id=${idEvento}`);
+
+      const promiseExibe = await api.get(
+        `/ComentariosEvento/ListarSomenteExibe?id=${idEvento}`
+      );
+      userData.role === "Administrador"
+        ? setComentarios(promise.data)
+        : setComentarios(promiseExibe.data);
+    } catch (error) {
+      console.log("Erro ao buscar comentario", error);
+    }
+  }, [idEvento, userData]);
+
+  const deleteComentario = async (idComentario) => {
+    try {
+      if (userData.role === "Administrador") {
+        await api.delete(`/ComentariosEvento/${idComentario}`);
+      } else {
+        alert("voce nao tem permissao");
+      }
+    } catch (error) {
+      console.log("Erro ao deletar comentario", error);
+    }
+  };
+
+  const exibeComentario = async (idComentario, descricao, exibe = false) => {
+    try {
+      await api.put(`/ComentariosEvento?id=${idComentario}`, {
+        descricao,
+        exibe,
+      });
+      getComentario();
+    } catch (error) {
+      console.log("Erro ao deletar comentario", error);
+    }
+  };
 
   useEffect(() => {
-    async function DetailsEvents( ) {
-      try {
-        const promiseFeedbacks = await api.get(commentaryEventResource);
-
-        setFeedback(promiseFeedbacks.data);
-
-        console.log(promiseFeedbacks.data);
-        console.log(feedback);
-      } catch (error) {
-        
-      }
-    }
-    DetailsEvents();
-  }, []);
+    getEvento();
+    getComentario();
+  }, [idEvento, getEvento, getComentario, userData, comentarios]);
 
   return (
     <MainContent>
-      {userData.role == "Administrador" ? (
-        <Link to={"/eventos"}>
-          <img className="setinha" src={backArrow} alt="setinha para voltar" />
-        </Link>
-      ):(
-        <Link to={"/eventos-alunos"}>
-          <img src={backArrow} alt="setinha para voltar" />
-        </Link>
-      )}
-
-      <section className="detalhes-evento">
-        
-          <Title titleText={evento.nomeEvento} />
-          <div className="events-box">
-            <EventoAnterior
-              key={evento.idEvento}
-              title={evento.nomeEvento}
-              description={evento.descricao}
-              eventDate={evento.dataEvento}
-              idEvent={evento.idEvento}
+      <section className="detalhes-evento-main">
+        <Container>
+          <div className="detalhes-evento-page">
+            <Title
+              additionalClass="margem-acima"
+              titleText={`Evento: ${evento.nomeEvento}`}
             />
+            <div className="detalhes-evento-flex">
+              <p className="detalhe-evento-propriedade">
+                <b>Data:</b> {new Date(evento.dataEvento).toLocaleDateString()}
+              </p>
+              <p className="detalhe-evento-propriedade">
+                <b>Tipo evento:</b> {tipoEvento}
+              </p>
+              <p className="detalhe-evento-propriedade">
+                <b>Instituição:</b> {instituicao}
+              </p>
+            </div>
+            <p className="detalhe-evento-propriedade">
+              <b>Descrição:</b> <br /> {evento.descricao}
+            </p>
           </div>
-       
+        </Container>
+      </section>
+      <section className="lista-comentarios-section">
+        <Container>
+          <Title
+            additionalClass="margem-acima"
+            titleText={"Lista de comentários"}
+            color="white"
+          ></Title>
+          {new Date(evento.dataEvento).toJSON() > new Date().toJSON() ? (
+            <p className="sem-comentarios">Esse evento ainda não aconteceu.</p>
+          ) : comentarios.length === 0 ? (
+            <p className="sem-comentarios">
+              Esse evento não possui comentários
+            </p>
+          ) : (
+            <TableEvComments
+              fnExibe={exibeComentario}
+              dados={comentarios}
+              fnDelete={deleteComentario}
+            />
+          )}
+        </Container>
       </section>
     </MainContent>
   );
